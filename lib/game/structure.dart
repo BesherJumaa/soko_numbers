@@ -1,9 +1,25 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../main.dart';
+class States {
+  var depth = 0;
+}
 
 class Structure {
+  int xP1 = 1, yP1 = 1;
+  int xP2 = 1, yP2 = 1;
+  int xP3 = 1, yP3 = 1;
+  int xP4 = 1, yP4 = 1;
+  int xP5 = 1, yP5 = 1;
+  int xG1 = 1, yG1 = 1;
+  int xG2 = 1, yG2 = 1;
+  int xG3 = 1, yG3 = 1;
+  int xG4 = 1, yG4 = 1;
+  int xG5 = 1, yG5 = 1;
+  var depth = 1;
+  States state = States();
   //Level 1
   List<List<String>> board = [
     ["", "", "", "", "", "", ""],
@@ -114,17 +130,6 @@ class Structure {
     printState();
   }
 
-  int x = 3, y = 3;
-  int xP1 = 1, yP1 = 1;
-  int xP2 = 1, yP2 = 1;
-  int xP3 = 1, yP3 = 1;
-  int xP4 = 1, yP4 = 1;
-  int xP5 = 1, yP5 = 1;
-  int xG1 = 1, yG1 = 1;
-  int xG2 = 1, yG2 = 1;
-  int xG3 = 1, yG3 = 1;
-  int xG4 = 1, yG4 = 1;
-  int xG5 = 1, yG5 = 1;
   getAllPositions() {
     player1Position();
     player2Position();
@@ -142,6 +147,8 @@ class Structure {
     drawGoals(xG3, yG3, "finalP3");
     drawGoals(xG4, yG4, "finalP4");
     drawGoals(xG5, yG5, "finalP5");
+
+    // print(getNextState());
   }
 
   drawGoals(int xGoal, int yGoal, String goals) {
@@ -197,7 +204,6 @@ class Structure {
     return false;
   }
 
-  getNextState() {}
   move(String direction, int xPlayer, int yPlayer) {
     if (direction == "right") {
       if (board[xPlayer][yPlayer] != "T") {
@@ -261,67 +267,179 @@ class Structure {
     if (check1) {
       move(direction, xP1, yP1);
     }
-    // move(direction, xP1, yP1);
-    // move(direction, xP2, yP2);
-    // move(direction, xP3, yP3);
-    // move(direction, xP4, yP4);
-    // move(direction, xP5, yP5);
+  }
+
+  List<Structure> getNextStates() {
+    state.depth++;
+    depth++;
+    List<Structure> nextStates = [];
+    Structure s = deepCopy();
+    bool checkRight = s.checkCloneMove("right");
+    bool checkLeft = s.checkCloneMove("left");
+    bool checkUp = s.checkCloneMove("up");
+    bool checkDown = s.checkCloneMove("down");
+    if (checkUp) {
+      s = deepCopy();
+      s.doMove("up");
+      print("Moving up");
+      nextStates.add(s);
+
+      print(board);
+      print(s.board);
+      print("=======================================");
+    }
+    if (checkDown) {
+      s = deepCopy();
+      print("Moving down");
+      s.doMove("down");
+
+      nextStates.add(s);
+
+      print(board);
+      print(s.board);
+      print("=======================================");
+    }
+    if (checkRight) {
+      s = deepCopy();
+      s.doMove("right");
+      print("Moving Right");
+      nextStates.add(s);
+
+      print(board);
+      print(s.board);
+      print("=======================================");
+    }
+
+    if (checkLeft) {
+      s = deepCopy();
+      s.doMove("left");
+      print("Moving left");
+      nextStates.add(s);
+
+      print(board);
+      print(s.board);
+      print("=======================================");
+    }
+
+    for (int i = 0; i < nextStates.length; i++) {
+      print("Next States $i: ${nextStates[i].board}");
+    }
+    return nextStates;
+  }
+
+  deepCopy() {
+    Structure s = Structure();
+
+    s.xP1 = xP1;
+    s.xP2 = xP2;
+    s.xP3 = xP3;
+    s.xP4 = xP4;
+    s.xP5 = xP5;
+    s.yP1 = yP1;
+    s.yP2 = yP2;
+    s.yP3 = yP3;
+    s.yP4 = yP4;
+    s.yP5 = yP5;
+    s.xG1 = xG1;
+    s.xG2 = xG2;
+    s.xG3 = xG3;
+    s.xG4 = xG4;
+    s.xG5 = xG5;
+    s.yG1 = yG1;
+    s.yG2 = yG2;
+    s.yG3 = yG3;
+    s.yG4 = yG4;
+    s.yG5 = yG5;
+    s.depth = depth;
+    s.selectedLvl = selectedLvl;
+    for (int i = 0; i < board.length; i++) {
+      for (int j = 0; j < board.length; j++) {
+        s.board[i][j] = board[i][j];
+      }
+    }
+
+    return s;
+  }
+
+  late Structure s = deepCopy();
+  bool checkCloneMove(direction) {
+    bool check5 = checkMoves(direction, xP5, yP5);
+    bool check4 = checkMoves(direction, xP4, yP4);
+    bool check3 = checkMoves(direction, xP3, yP3);
+    bool check2 = checkMoves(direction, xP2, yP2);
+    bool check1 = checkMoves(direction, xP1, yP1);
+
+    if (check1 || check2 || check3 || check4 || check5) {
+      return true;
+    }
+    return false;
   }
 
   Widget printState() {
     getAllPositions();
     return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          Column(
+          // Text("Next State: "
+          //     "box1 = [${s.xP1}] [${s.yP1}] "
+          //     "box2 = [${s.xP2}] [${s.yP2}] "
+          //     "box3 = [${s.xP3}] [${s.yP3}] "
+          //     "box4 = [${s.xP4}] [${s.yP4}] "
+          //     "box5 = [${s.xP5}] [${s.yP5}] "
+          //     ""),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "Board Box 1 [$xP1][$yP1]= ${board[xP1][yP1]}",
-                style: const TextStyle(color: Colors.blue),
+              Column(
+                children: [
+                  Text(
+                    "Board Box 1 [$xP1][$yP1]= ${board[xP1][yP1]}",
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                  Text(
+                    "Board Box 2 [$xP2][$yP2]= ${board[xP2][yP2]}",
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                  Text(
+                    "Board Box 3 [$xP3][$yP3]= ${board[xP3][yP3]}",
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                  Text(
+                    "Board Box 4 [$xP4][$yP4]= ${board[xP4][yP4]}",
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                  Text(
+                    "Board Box 5 [$xP5][$yP5]= ${board[xP5][yP5]}",
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                ],
               ),
-              Text(
-                "Board Box 2 [$xP2][$yP2]= ${board[xP2][yP2]}",
-                style: const TextStyle(color: Colors.blue),
+              const SizedBox(
+                width: 50,
               ),
-              Text(
-                "Board Box 3 [$xP3][$yP3]= ${board[xP3][yP3]}",
-                style: const TextStyle(color: Colors.blue),
-              ),
-              Text(
-                "Board Box 4 [$xP4][$yP4]= ${board[xP4][yP4]}",
-                style: const TextStyle(color: Colors.blue),
-              ),
-              Text(
-                "Board Box 5 [$xP5][$yP5]= ${board[xP5][yP5]}",
-                style: const TextStyle(color: Colors.blue),
-              ),
-            ],
-          ),
-          const SizedBox(
-            width: 50,
-          ),
-          Column(
-            children: [
-              Text(
-                "Board Goal 1 [$xG1][$yG1]= ${board[xG1][yG1]}",
-                style: const TextStyle(color: Colors.red),
-              ),
-              Text(
-                "Board Goal 2 [$xG2][$yG2]= ${board[xG2][yG2]}",
-                style: const TextStyle(color: Colors.red),
-              ),
-              Text(
-                "Board Goal 3 [$xG3][$yG3]= ${board[xG3][yG3]}",
-                style: const TextStyle(color: Colors.red),
-              ),
-              Text(
-                "Board Goal 4 [$xG4][$yG4]= ${board[xG4][yG4]}",
-                style: const TextStyle(color: Colors.red),
-              ),
-              Text(
-                "Board Goal 5 [$xG5][$yG5]= ${board[xG5][yG5]}",
-                style: const TextStyle(color: Colors.red),
+              Column(
+                children: [
+                  Text(
+                    "Board Goal 1 [$xG1][$yG1]= ${board[xG1][yG1]}",
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  Text(
+                    "Board Goal 2 [$xG2][$yG2]= ${board[xG2][yG2]}",
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  Text(
+                    "Board Goal 3 [$xG3][$yG3]= ${board[xG3][yG3]}",
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  Text(
+                    "Board Goal 4 [$xG4][$yG4]= ${board[xG4][yG4]}",
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  Text(
+                    "Board Goal 5 [$xG5][$yG5]= ${board[xG5][yG5]}",
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
               ),
             ],
           ),
@@ -332,6 +450,7 @@ class Structure {
 
   equal() {}
   isFinal() {
+    getAllPositions();
     if (xP1 == xG1 &&
         yP1 == yG1 &&
         xP2 == xG2 &&
