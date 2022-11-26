@@ -148,7 +148,8 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             onPressed: () {
               setState(() {
-                l.bfs(s);
+                s.depth = 0;
+                l.uCS(s);
               });
             },
             child: const Text("UCS"),
@@ -156,7 +157,8 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             onPressed: () {
               setState(() {
-                l.bfs(s);
+                s.depth = 0;
+                l.ndfs(s);
               });
             },
             child: const Text("Astar"),
@@ -204,6 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.blue,
             child: const Text("Get Next States"),
           ),
+
           s.printState(),
           IconButton(
               splashColor: Colors.blue,

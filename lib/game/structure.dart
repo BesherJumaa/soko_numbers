@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class States {
-  var depth = 0;
+  static int visited = 0;
+  static int deepth = 0;
+  static int cost = 0;
 }
 
 class Structure {
@@ -18,8 +20,10 @@ class Structure {
   int xG3 = 1, yG3 = 1;
   int xG4 = 1, yG4 = 1;
   int xG5 = 1, yG5 = 1;
-  var depth = 1;
+  var depth = 0;
+  int cost = 0;
   States state = States();
+  // Structure parent=Structure();
   //Level 1
   List<List<String>> board = [
     ["", "", "", "", "", "", ""],
@@ -205,6 +209,24 @@ class Structure {
   }
 
   move(String direction, int xPlayer, int yPlayer) {
+    if (direction == "up") {
+      if (board[xPlayer][yPlayer] != "T") {
+        if (checkMoves(direction, xPlayer, yPlayer)) {
+          board[xPlayer - 1][yPlayer] = board[xPlayer][yPlayer];
+          board[xPlayer][yPlayer] = "T";
+          getAllPositions();
+        }
+      }
+    }
+    if (direction == "down") {
+      if (board[xPlayer][yPlayer] != "T") {
+        if (checkMoves(direction, xPlayer, yPlayer)) {
+          board[xPlayer + 1][yPlayer] = board[xPlayer][yPlayer];
+          board[xPlayer][yPlayer] = "T";
+          getAllPositions();
+        }
+      }
+    }
     if (direction == "right") {
       if (board[xPlayer][yPlayer] != "T") {
         if (checkMoves(direction, xPlayer, yPlayer)) {
@@ -225,53 +247,37 @@ class Structure {
       }
     }
     //-----------------
-    if (direction == "up") {
-      if (board[xPlayer][yPlayer] != "T") {
-        if (checkMoves(direction, xPlayer, yPlayer)) {
-          board[xPlayer - 1][yPlayer] = board[xPlayer][yPlayer];
-          board[xPlayer][yPlayer] = "T";
-          getAllPositions();
-        }
-      }
-    }
+
     //-----------------
-    if (direction == "down") {
-      if (board[xPlayer][yPlayer] != "T") {
-        if (checkMoves(direction, xPlayer, yPlayer)) {
-          board[xPlayer + 1][yPlayer] = board[xPlayer][yPlayer];
-          board[xPlayer][yPlayer] = "T";
-          getAllPositions();
-        }
-      }
-    }
   }
 
   doMove(direction) {
-    bool check5 = checkMoves(direction, xP5, yP5);
-    bool check4 = checkMoves(direction, xP4, yP4);
-    bool check3 = checkMoves(direction, xP3, yP3);
-    bool check2 = checkMoves(direction, xP2, yP2);
     bool check1 = checkMoves(direction, xP1, yP1);
-    if (check5) {
-      move(direction, xP5, yP5);
-    }
-    if (check4) {
-      move(direction, xP4, yP4);
-    }
-    if (check3) {
-      move(direction, xP3, yP3);
+    bool check2 = checkMoves(direction, xP2, yP2);
+    bool check3 = checkMoves(direction, xP3, yP3);
+    bool check4 = checkMoves(direction, xP4, yP4);
+    bool check5 = checkMoves(direction, xP5, yP5);
+    if (check1) {
+      move(direction, xP1, yP1);
     }
     if (check2) {
       move(direction, xP2, yP2);
     }
-    if (check1) {
-      move(direction, xP1, yP1);
+    if (check3) {
+      move(direction, xP3, yP3);
+    }
+    if (check4) {
+      move(direction, xP4, yP4);
+    }
+    if (check5) {
+      move(direction, xP5, yP5);
     }
   }
 
   List<Structure> getNextStates() {
-    state.depth++;
+    // state.depth++;
     depth++;
+    cost++;
     List<Structure> nextStates = [];
     Structure s = deepCopy();
     bool checkRight = s.checkCloneMove("right");
@@ -295,9 +301,9 @@ class Structure {
 
       nextStates.add(s);
 
-      print(board);
-      print(s.board);
-      print("=======================================");
+      // print(board);
+      // print(s.board);
+      // print("=======================================");
     }
     if (checkRight) {
       s = deepCopy();
@@ -305,9 +311,9 @@ class Structure {
       print("Moving Right");
       nextStates.add(s);
 
-      print(board);
-      print(s.board);
-      print("=======================================");
+      // print(board);
+      // print(s.board);
+      // print("=======================================");
     }
 
     if (checkLeft) {
@@ -316,14 +322,14 @@ class Structure {
       print("Moving left");
       nextStates.add(s);
 
-      print(board);
-      print(s.board);
-      print("=======================================");
+      // print(board);
+      // print(s.board);
+      // print("=======================================");
     }
 
-    for (int i = 0; i < nextStates.length; i++) {
-      print("Next States $i: ${nextStates[i].board}");
-    }
+    // for (int i = 0; i < nextStates.length; i++) {
+    //   print("Next States $i: ${nextStates[i].board}");
+    // }
     return nextStates;
   }
 
@@ -380,6 +386,14 @@ class Structure {
     return Center(
       child: Column(
         children: [
+          Text(
+            "Depth is : ${States.deepth}",
+            style: const TextStyle(color: Colors.green),
+          ),
+          Text(
+            "Visited nodes number is : ${States.visited}",
+            style: TextStyle(color: Colors.green),
+          ),
           // Text("Next State: "
           //     "box1 = [${s.xP1}] [${s.yP1}] "
           //     "box2 = [${s.xP2}] [${s.yP2}] "
@@ -471,8 +485,14 @@ class Structure {
         title: Center(
           child: Container(
             padding: const EdgeInsets.all(10),
-            child: Text(
-              "You Won Level $selectedLvl!!",
+            child: Column(
+              children: [
+                Text(
+                  "You Won Level $selectedLvl!!",
+                ),
+                // Text("Depth is : ${States.deepth} "),
+                // Text("visited nodes number is : ${States.visited} "),
+              ],
             ),
           ),
         ),
