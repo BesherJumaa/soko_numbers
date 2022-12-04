@@ -51,7 +51,6 @@ class Logic {
   }
 
   dfs(Structure s) {
-    int depth = 1;
     s = s.deepCopy();
     final stopwatch = Stopwatch()..start();
     List<Structure> stack = [s];
@@ -80,7 +79,7 @@ class Logic {
     }
     States.visited = visited.length;
     States.deepth = stack.last.depth;
-    print('visited nodes are : ${visited}');
+    print('visited nodes are : $visited');
     print("**********************-{Results}-****************************");
     print('Depth : ${stack.last.depth}');
 
@@ -128,7 +127,6 @@ class Logic {
     Structure pqueue;
     PriorityQueue<Structure> queue =
         PriorityQueue<Structure>((b, a) => b.depth.compareTo(a.depth));
-
     queue.add(s);
     final stopwatch = Stopwatch()..start();
     var visited = <String, bool>{}; //;
@@ -162,15 +160,44 @@ class Logic {
   }
 
   aStar(Structure s) {
-    // queue that prioritizes longer strings
-    final queue = PriorityQueue<String>((b, a) => b.length.compareTo(a.length));
-    queue
-      ..add('foo')
-      ..add('bazars')
-      ..add('zort');
+    Structure pqueue;
+    PriorityQueue<Structure> queue = PriorityQueue<Structure>((b, a) {
+      if (b.getCost() == a.getCost()) {
+        return b.herustic().compareTo(a.herustic());
+      }
+      return b.getCost().compareTo(a.getCost());
+    });
 
+    queue.add(s);
+    final stopwatch = Stopwatch()..start();
+    var visited = <String, bool>{}; //;
+    String ss;
+    List<Structure> nextStates;
     while (queue.isNotEmpty) {
-      print('* ${queue.removeFirst()}');
+      ss = queue.first.board.toString();
+      visited[ss] = true;
+      if (queue.first.isFinal()) {
+        print("You WON");
+        break;
+      }
+      pqueue = queue.removeFirst();
+      nextStates = pqueue.getNextStates();
+      for (var i = 0; i < nextStates.length; i++) {
+        ss = nextStates[i].board.toString();
+        if (!visited.containsKey(ss)) {
+          queue.add(nextStates[i]);
+        }
+      }
     }
+
+    States.visited = visited.length;
+    States.deepth = queue.first.depth;
+    print('visited nodes are : $visited');
+    print("**********************-{Results}-****************************");
+    print('Depth : ${queue.first.depth}');
+    print('visited nodes numbers is : ${visited.length}');
+    print('BFS executed in ${stopwatch.elapsed}');
+    print("cost is : ${queue.first.getCost()}");
+    print("**********************-{END}-****************************");
   }
 }

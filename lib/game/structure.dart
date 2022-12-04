@@ -22,6 +22,7 @@ class Structure {
   int xG5 = 1, yG5 = 1;
   var depth = 0;
   int cost = 0;
+
   States state = States();
   // Structure parent=Structure();
   //Level 1
@@ -274,10 +275,32 @@ class Structure {
     }
   }
 
+  int herustic() {
+    return (xP1 - xG1).abs() +
+        (yP1 - yG1).abs() +
+        (xP2 - xG2).abs() +
+        (yP2 - yG2).abs() +
+        (xP3 - xG3).abs() +
+        (yP3 - yG3).abs() +
+        (xP4 - xG4).abs() +
+        (yP4 - yG4).abs() +
+        (xP5 - xG5).abs() +
+        (yP5 - yG5).abs();
+  }
+
+  getCost() {
+    cost = herustic().toInt() + depth;
+    print("Herustic  = ${herustic().toInt()}");
+    print("Depth = $depth");
+    print("Cost = $cost");
+    print("--------------------------");
+    return cost;
+  }
+
   List<Structure> getNextStates() {
     // state.depth++;
     depth++;
-    cost++;
+    getCost();
     List<Structure> nextStates = [];
     Structure s = deepCopy();
     bool checkRight = s.checkCloneMove("right");
@@ -357,6 +380,7 @@ class Structure {
     s.yG4 = yG4;
     s.yG5 = yG5;
     s.depth = depth;
+    s.cost = cost;
     s.selectedLvl = selectedLvl;
     for (int i = 0; i < board.length; i++) {
       for (int j = 0; j < board.length; j++) {
@@ -392,7 +416,7 @@ class Structure {
           ),
           Text(
             "Visited nodes number is : ${States.visited}",
-            style: TextStyle(color: Colors.green),
+            style: const TextStyle(color: Colors.green),
           ),
           // Text("Next State: "
           //     "box1 = [${s.xP1}] [${s.yP1}] "

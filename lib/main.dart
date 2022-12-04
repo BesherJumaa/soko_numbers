@@ -158,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               setState(() {
                 s.depth = 0;
-                l.ndfs(s);
+                l.aStar(s);
               });
             },
             child: const Text("Astar"),
