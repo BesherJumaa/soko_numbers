@@ -1,8 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:keymap/keymap.dart';
 import 'package:flutter/material.dart';
+import 'package:soko_number/game/logic.dart';
 import 'package:soko_number/game/structure.dart';
+import 'package:soko_number/view/explandableFab.dart';
 import 'package:soko_number/view/widgets/selectlvlbut.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -37,6 +41,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Structure s = Structure();
+  Structure n = Structure();
+  Logic l = Logic();
 
   @override
   Widget build(BuildContext context) {
@@ -120,32 +126,144 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      floatingActionButton: ExpandableFab(
+        distance: 120,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                l.bfs(s);
+              });
+            },
+            child: const Text("BFS"),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                l.dfs(s);
+              });
+            },
+            child: const Text("DFS"),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                s.depth = 0;
+                l.uCS(s);
+              });
+            },
+            child: const Text("UCS"),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                s.depth = 0;
+                l.aStar(s);
+              });
+            },
+            child: const Text("Astar"),
+          ),
+        ],
+      ),
       body: _buildGameBody(),
     );
   }
 
   Widget _buildGameBody() {
     int gridStateLength = s.board.length;
-    s.getAllPositions();
+    // s.getAllPositions();
     return SingleChildScrollView(
       child: Center(
         child: Column(children: <Widget>[
           Container(
-            height: 500,
-            width: 500,
+            height: 400,
+            width: 400,
             padding: const EdgeInsets.all(8.0),
             margin: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 2.0)),
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: gridStateLength,
+            child: Center(
+              child: SizedBox(
+                height: double.infinity,
+                width: double.infinity,
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: gridStateLength,
+                  ),
+                  itemBuilder: _drawBoardItems,
+                  itemCount: gridStateLength * gridStateLength,
+                ),
               ),
-              itemBuilder: _drawBoardItems,
-              itemCount: gridStateLength * gridStateLength,
             ),
           ),
+          MaterialButton(
+            onPressed: () {
+              setState(() {
+                s.getNextStates();
+                // print(s.getNextState());
+              });
+            },
+            color: Colors.blue,
+            child: const Text("Get Next States"),
+          ),
+
           s.printState(),
+          IconButton(
+              splashColor: Colors.blue,
+              onPressed: () {
+                s.doMove("up");
+                // s.isFinal();
+                setState(
+                  () {
+                    s.isFinal();
+                  },
+                );
+              },
+              icon: const Icon(Icons.arrow_circle_up)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                  splashColor: Colors.blue,
+                  onPressed: () {
+                    s.doMove("left");
+                    // s.isFinal();
+                    setState(
+                      () {
+                        s.isFinal();
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.arrow_circle_left_outlined)),
+              const SizedBox(
+                width: 50,
+              ),
+              IconButton(
+                  splashColor: Colors.blue,
+                  onPressed: () {
+                    s.doMove("right");
+                    // s.isFinal();
+                    setState(
+                      () {
+                        s.isFinal();
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.arrow_circle_right_outlined)),
+            ],
+          ),
+          IconButton(
+              splashColor: Colors.blue,
+              onPressed: () {
+                s.doMove("down");
+                // s.isFinal();
+                setState(
+                  () {
+                    s.isFinal();
+                  },
+                );
+              },
+              icon: const Icon(Icons.arrow_circle_down)),
           //----------------------------------------------
         ]),
       ),
